@@ -17,7 +17,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
 
-    void _submit() {
+    void submit() {
       final isValid = _formKey.currentState!.validate();
       FocusScope.of(context).unfocus();
 
@@ -78,7 +78,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               _userPassword = value!;
                             },
                             validator: (value) {
-                              if (value == null || value.isEmpty || value.length < 6) {
+                              if (value == null || value.isEmpty || value.trim().length < 6) {
                                 return 'Please enter a valid password (at least 6 characters).';
                               }
                               return null;
@@ -86,7 +86,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           SizedBox(height: 24),
                           ElevatedButton(
-                            onPressed: _submit,
+                            onPressed: submit,
                             child: Text(isLogin ? 'Login' : 'Sign Up'),
                           ),
                           TextButton(
