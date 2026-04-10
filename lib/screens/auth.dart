@@ -1,6 +1,8 @@
+import 'package:chito_chat/widgets/user_image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'dart:io';
 
 final firebase = FirebaseAuth.instance;
 
@@ -17,14 +19,20 @@ class _AuthScreenState extends State<AuthScreen> {
    var _userEmail = '';
    var _userPassword = '';
    var isLoading = false;
+   File? _userImageFile;
 
    void submit() async{
       final isValid = _formKey.currentState!.validate();
       FocusScope.of(context).unfocus();
 
-      if(!isValid) {
+      if(!isValid || (!isLogin && _userImageFile == null)) {
+         ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(!isLogin && _userImageFile == null ? 'Please pick an image.' : 'Please enter valid credentials!' )),
+          );
         return;
       }
+
 
       
       _formKey.currentState!.save();
@@ -34,7 +42,12 @@ class _AuthScreenState extends State<AuthScreen> {
         await firebase.signInWithEmailAndPassword(email: _userEmail, password: _userPassword);
       } else {
           final userCredentials = await firebase.createUserWithEmailAndPassword(email: _userEmail, password: _userPassword);
-          print(userCredentials);
+          
+          final imageRef = FirebaseStorage.instance.ref('user_images').
+            child('${userCredentials.user!.uid}.jpg');
+
+            await imageRef.putFile(_userImageFile!);
+            final imageUrl = await imageRef.getDownloadURL();
       }
         } on FirebaseAuthException catch (error) {
           if (!mounted) return;
@@ -80,6 +93,11 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          if(!isLogin) UserImagePicker(
+                            onPickImage: (pickedImage) {
+                              _userImageFile = pickedImage;
+                            },
+                          ),
                           TextFormField(
                             decoration: InputDecoration(labelText: 'Email'),
                             keyboardType: TextInputType.emailAddress,
