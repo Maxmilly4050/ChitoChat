@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
+final firebase = FirebaseAuth.instance;
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -12,20 +16,41 @@ class _AuthScreenState extends State<AuthScreen> {
    final _formKey = GlobalKey<FormState>();
    var _userEmail = '';
    var _userPassword = '';
+   var isLoading = false;
+
+   void submit() async{
+      final isValid = _formKey.currentState!.validate();
+      FocusScope.of(context).unfocus();
+
+      if(!isValid) {
+        return;
+      }
+
+      
+      _formKey.currentState!.save();
+
+    try {
+      if(isLogin) {
+        await firebase.signInWithEmailAndPassword(email: _userEmail, password: _userPassword);
+      } else {
+          final userCredentials = await firebase.createUserWithEmailAndPassword(email: _userEmail, password: _userPassword);
+          print(userCredentials);
+      }
+        } on FirebaseAuthException catch (error) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.message ?? 'An error occurred, please check your credentials!' )),
+          );
+        }
+      
+    }
 
 
   @override
   Widget build(BuildContext context) {
 
-    void submit() {
-      final isValid = _formKey.currentState!.validate();
-      FocusScope.of(context).unfocus();
-
-      if (isValid) {
-        _formKey.currentState!.save();
-        // Handle authentication logic here
-      }
-    }
+    
    
 
     return Scaffold(
