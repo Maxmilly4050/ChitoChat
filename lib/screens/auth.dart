@@ -33,11 +33,13 @@ class _AuthScreenState extends State<AuthScreen> {
         return;
       }
 
-
-      
       _formKey.currentState!.save();
 
     try {
+      setState(() {
+        isLoading = true;
+      });
+
       if(isLogin) {
         await firebase.signInWithEmailAndPassword(email: _userEmail, password: _userPassword);
       } else {
@@ -55,6 +57,9 @@ class _AuthScreenState extends State<AuthScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(error.message ?? 'An error occurred, please check your credentials!' )),
           );
+          setState(() {
+            isLoading = false;
+          });
         }
       
     }
@@ -128,19 +133,22 @@ class _AuthScreenState extends State<AuthScreen> {
                             },
                           ),
                           SizedBox(height: 24),
-                          ElevatedButton(
-                            onPressed: submit,
-                            child: Text(isLogin ? 'Login' : 'Sign Up'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                isLogin = !isLogin;
-                              });
-                            },
-                            child: Text(
-                              isLogin ? 'Create new account' : 'I already have an account'),
-                          )
+                          if(isLoading) CircularProgressIndicator(),
+                          if(!isLoading)
+                            ElevatedButton(
+                              onPressed: submit,
+                              child: Text(isLogin ? 'Login' : 'Sign Up'),
+                            ),
+                          if(!isLoading)
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  isLogin = !isLogin;
+                                });
+                              },
+                              child: Text(
+                                isLogin ? 'Create new account' : 'I already have an account'),
+                            )
                         ],
                       ),
                     ),
