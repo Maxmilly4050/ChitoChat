@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class ChatMessages extends StatefulWidget {
-  const ChatMessages({super.key});
+class NewMessage extends StatefulWidget {
+  const NewMessage({super.key});
 
   @override
-  State<ChatMessages> createState() => _ChatMessagesState();
+  State<NewMessage> createState() => _NewMessageState();
 }
 
-class _ChatMessagesState extends State<ChatMessages> {
+class _NewMessageState extends State<NewMessage> {
   final _textController = TextEditingController();
 
   @override
@@ -28,7 +28,7 @@ class _ChatMessagesState extends State<ChatMessages> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 15.0, right: 1.0, bottom: 8.0),
+      padding: const EdgeInsets.only(left: 15.0, right: 1.0, bottom: 18.0),
       child: Row(
         children: [
           Expanded(

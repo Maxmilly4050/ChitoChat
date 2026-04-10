@@ -1,3 +1,5 @@
+import 'package:chito_chat/widgets/chat_messages.dart';
+import 'package:chito_chat/widgets/new_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,8 +21,13 @@ class ChatScreen extends StatelessWidget {
         ],
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
-      body: const Center(
-        child: Text('Let\'s chat!'),
+      body: Column(
+        children: [
+          Expanded(
+            child: ChatMessages(),
+          ),
+          NewMessage(),
+        ],
       ),
     );
   }
