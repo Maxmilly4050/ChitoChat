@@ -1,4 +1,6 @@
+import 'package:chito_chat/widgets/message_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessages extends StatelessWidget {
@@ -6,6 +8,8 @@ class ChatMessages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authenticatedUser = FirebaseAuth.instance.currentUser;
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection('chat').orderBy('createdAt', descending: true).snapshots(), 
       builder: (context, snapshot) {
@@ -26,7 +30,23 @@ class ChatMessages extends StatelessWidget {
           padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 10.0, bottom: 1.0),
           reverse: true,
           itemCount: chatDocs.length,
-          itemBuilder: (context, index) => Text(chatDocs[index].data()['text']),
+          itemBuilder: (context, index) {
+            final chatMessage = chatDocs[index].data();
+            final nextChatMessage = index + 1 < chatDocs.length ? chatDocs[index + 1].data() : null;
+            final isSameUser = nextChatMessage != null && chatMessage['userId'] == nextChatMessage['userId'];
+
+            if(isSameUser){
+              return MessageBubble.next(
+                message: chatMessage['text'], 
+                isMe: chatMessage['userId'] == authenticatedUser!.uid);
+            }else{
+              return MessageBubble.first(
+                userImage: chatMessage['userImage'], 
+                username: chatMessage['username'], 
+                message: chatMessage['text'], 
+                isMe: chatMessage['userId'] == authenticatedUser!.uid);
+            }
+          },
         );
       },
       );
