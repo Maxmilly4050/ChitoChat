@@ -1,5 +1,6 @@
 import 'package:chito_chat/widgets/user_image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:io';
@@ -50,7 +51,12 @@ class _AuthScreenState extends State<AuthScreen> {
 
             await imageRef.putFile(_userImageFile!);
             final imageUrl = await imageRef.getDownloadURL();
-      }
+            await FirebaseFirestore.instance.collection('users').doc(userCredentials.user!.uid).set({
+              'username': _userEmail.split('@')[0],
+              'email': _userEmail,
+              'image_url': imageUrl,
+            });
+          }
         } on FirebaseAuthException catch (error) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).clearSnackBars();
