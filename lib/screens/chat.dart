@@ -17,6 +17,7 @@ class ChatScreen extends StatelessWidget {
             icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.secondary),
           ),
         ],
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       ),
       body: const Center(
         child: Text('Let\'s chat!'),
